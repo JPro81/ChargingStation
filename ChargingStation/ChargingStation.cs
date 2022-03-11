@@ -6,7 +6,7 @@ namespace ChargingStationCore
 {
     public class ChargingStation
     {
-        private readonly List<Slot> _slots = new() 
+        private readonly List<Slot> _slots = new()
         {
             new(SlotId.One),
             new(SlotId.Two),
@@ -19,28 +19,27 @@ namespace ChargingStationCore
 
         }
 
-        public ChargingState State { get; private set; }
-        public int Power { get; private set; } 
-
-        public void StartCharging(SlotId slotId) 
+        public ChargingState State
         {
-            if (State == ChargingState.NonCharging)
+            get
             {
-                State = ChargingState.Charging;
+                return _slots.Any(x => x.State.ChargingState == ChargingState.Charging)
+                    ? ChargingState.Charging 
+                    : ChargingState.NonCharging;
             }
 
+        }
+
+        public int Power { get; private set; }
+
+        public void StartCharging(SlotId slotId)
+        {
             Slot slot = _slots.Find(x => x.Id == slotId);
-            slot.StartCharging();      
-            
+            slot.StartCharging();
         }
 
         public void StopCharging(SlotId slotId)
         {
-            if (State == ChargingState.Charging)
-            {
-                State = ChargingState.NonCharging;
-            }
-
             Slot slot = _slots.Find(x => x.Id == slotId);
             slot.StopCharging();
         }
@@ -48,11 +47,11 @@ namespace ChargingStationCore
         public SlotState GetSlotState(SlotId slotId)
         {
             Slot slot = _slots.Find(x => x.Id == slotId);
-                                    
+
             return slot.State;
-            
+
         }
     }
 
-    
+
 }

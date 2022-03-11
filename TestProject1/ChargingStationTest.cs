@@ -140,6 +140,8 @@ namespace ChargingStationTests
             SlotState slotState = chargingStation.GetSlotState(SlotId.Two);
 
             slotState.ChargingState.Should().Be(ChargingState.NonCharging);
+            //*******
+            chargingStation.State.Should().Be(ChargingState.Charging);
         }
 
         [Fact]
@@ -152,10 +154,32 @@ namespace ChargingStationTests
 
             SlotState slotState = chargingStation.GetSlotState(SlotId.One);
             slotState.ChargingState.Should().Be(ChargingState.NonCharging);
+            //*******
+            chargingStation.State.Should().Be(ChargingState.NonCharging);
         }
 
+        [Fact]
+        public void SlotOneStopChargingWhenSlotsOneAndTwoAreCharging()
+        {
+            ChargingStation chargingStation = CreateStationWithTwoSlotsCharging();
 
+            chargingStation.StopCharging(SlotId.One);
 
+            SlotState slotOneState = chargingStation.GetSlotState(SlotId.One);
+            SlotState slotTwoState = chargingStation.GetSlotState(SlotId.Two);
 
+            slotOneState.ChargingState.Should().Be(ChargingState.NonCharging);
+            slotTwoState.ChargingState.Should().Be(ChargingState.Charging);
+            //*******
+            chargingStation.State.Should().Be(ChargingState.Charging);
+        }
+
+        private static ChargingStation CreateStationWithTwoSlotsCharging()
+        {
+            ChargingStation chargingStation = new();
+            chargingStation.StartCharging(SlotId.One);
+            chargingStation.StartCharging(SlotId.Two);
+            return chargingStation;
+        }
     }
 }
