@@ -12,23 +12,21 @@ namespace ChargingStationCore
         {
             State = new();
             Id = slotId;
-            Power = 0;
         }
         
         public SlotState State { get; private set; }
         public SlotId Id { get; private set; }
-        public int Power { get; private set; }
-
+        
         internal void StartCharging()
         {
             State.ChargingState =  ChargingState.Charging;
-            Power = 50;
+            State.Power = 50;
         }
 
         public void StopCharging()
         {
             State.ChargingState = ChargingState.NonCharging;
-            Power = 0;
+            State.Power = 0;
         }
 
     }

@@ -7,6 +7,7 @@
         
         }
         public ChargingState ChargingState { get; internal set; }
-        
+        public int Power { get; internal set; }
+
     }
 }

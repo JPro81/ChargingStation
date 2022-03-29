@@ -8,12 +8,12 @@ namespace ChargingStationTests
     public class ChargingStationTest
     {
         [Fact]
-        public void ChargingStationCreation() 
+        public void ChargingStationCreation()
         {
             ChargingStation chargingStation = new();//Arrange + Act
 
             bool isChargingStationCreated = chargingStation is not null;
-            
+
             Assert.True(isChargingStationCreated);                  //Assert
 
         }
@@ -22,7 +22,7 @@ namespace ChargingStationTests
         public void ChargingStationCreationWithFluentAssertion()
         {
             ChargingStation chargingStation = new();//Arrange + Act
-                    
+
             chargingStation.Should().NotBeNull();                   //Assert
 
         }
@@ -67,7 +67,7 @@ namespace ChargingStationTests
 
         private static void DisconnectAllSlots(ChargingStation chargingStation)
         {
-            chargingStation.StopCharging(SlotId.One);                      
+            chargingStation.StopCharging(SlotId.One);
             chargingStation.StopCharging(SlotId.Two);
             chargingStation.StopCharging(SlotId.Three);
             chargingStation.StopCharging(SlotId.Four);
@@ -181,5 +181,93 @@ namespace ChargingStationTests
             chargingStation.StartCharging(SlotId.Two);
             return chargingStation;
         }
+
+        [Fact]
+        public void SlotOneStartChargingPowerIs50()
+        {
+            ChargingStation chargingStation = new();
+
+            chargingStation.StartCharging(SlotId.One);
+
+            SlotState slotOneState = chargingStation.GetSlotState(SlotId.One);
+            slotOneState.Power.Should().Be(50);
+        }
+
+        [Fact]
+        public void SlotOneStopChargingPowerIs0()
+        {
+            ChargingStation chargingStation = CreateStationWithSlotOneCharging();
+
+            chargingStation.StopCharging(SlotId.One);
+
+            SlotState slotOneState = chargingStation.GetSlotState(SlotId.One);
+            slotOneState.Power.Should().Be(0);
+        }
+
+        private static ChargingStation CreateStationWithSlotOneCharging()
+        {
+            ChargingStation chargingStation = new();
+            chargingStation.StartCharging(SlotId.One);
+            return chargingStation;
+        }
+
+        [Fact]
+        public void SlotOneAndTwoStartChargingPowerIs50Each()
+        {
+            ChargingStation chargingStation = CreateStationWithTwoSlotsCharging();
+
+            SlotState slotOneState = chargingStation.GetSlotState(SlotId.One);
+            SlotState slotTwoState = chargingStation.GetSlotState(SlotId.Two);
+
+            slotOneState.Power.Should().Be(50);
+            slotTwoState.Power.Should().Be(50);
+        }
+
+        [Fact]
+        public void SlotOneStopChargingWhenSlotsOneAndTwoAreChargingPowerSlotOneIs0()
+        {
+            ChargingStation chargingStation = CreateStationWithTwoSlotsCharging();
+
+            chargingStation.StopCharging(SlotId.One);
+
+            SlotState slotOneState = chargingStation.GetSlotState(SlotId.One);
+
+            slotOneState.Power.Should().Be(0);
+        }
+
+        [Fact]
+        public void StationPowerIs50WhenOneNonTurboSlotIsCharging()
+        {
+            ChargingStation chargingStation = CreateStationWithSlotOneCharging();
+
+            chargingStation.Power.Should().Be(50);
+        }
+
+        [Fact]
+        public void StationPowerIs100WhenTwoNonTurboSlotsAreCharging()
+        {
+            ChargingStation chargingStation = CreateStationWithTwoSlotsCharging();
+
+            chargingStation.Power.Should().Be(100);
+        }
+
+        [Fact]
+        public void StationPowerIs200WhenFourNonTurboSlotsAreCharging()
+        {
+            ChargingStation chargingStation = CreateStationWithFourSlotsCharging();
+
+            chargingStation.Power.Should().Be(200);
+        }
+
+        private static ChargingStation CreateStationWithFourSlotsCharging()
+        {
+            ChargingStation chargingStation = new();
+            chargingStation.StartCharging(SlotId.One);
+            chargingStation.StartCharging(SlotId.Two);
+            chargingStation.StartCharging(SlotId.Three);
+            chargingStation.StartCharging(SlotId.Four);
+            return chargingStation;
+        }
+
     }
 }
